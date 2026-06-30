@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voynich — Anatomy of the Most-Analyzed Pages</title>
+<style>
+  :root{
+    --bg:#0a0612; --panel:#140b22; --ink:#e9e2f5; --dim:#9d8bc4; --faint:#5f5080;
+    --violet:#a78bfa; --violet2:#c4b5fd; --gold:#d99a2b; --cyan:#5eead4; --pink:#f472b6; --green:#34d399;
+    --mono:'SFMono-Regular',ui-monospace,Menlo,Consolas,monospace; --serif:'Iowan Old Style',Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:radial-gradient(1100px 700px at 50% 0%,#1a0f2e 0%,#0a0612 60%);color:var(--ink);font-family:var(--serif)}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 18px 70px}
+  h1{font-size:28px;margin:0 0 2px} h1 b{color:var(--violet)}
+  .sub{font-family:var(--mono);font-size:12px;color:var(--dim);margin-bottom:6px}
+  .disc{font-family:var(--mono);font-size:11px;color:var(--faint);border-left:2px solid var(--gold);padding:8px 10px;margin:10px 0 18px;line-height:1.7;background:rgba(217,154,43,0.05)}
+  .disc b{color:var(--gold)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{font-family:var(--mono);font-size:12px;color:var(--dim);background:var(--panel);border:1px solid #2a1d44;
+    border-radius:8px 8px 0 0;padding:9px 14px;cursor:pointer}
+  .tab.sel{color:var(--ink);border-color:var(--violet);background:#1c1133}
+  .panel{background:var(--panel);border:1px solid #2a1d44;border-radius:0 12px 12px 12px;padding:18px;min-height:440px}
+  .panel h2{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--violet);margin:0 0 4px}
+  .folio{font-family:var(--mono);font-size:11px;color:var(--cyan);margin-bottom:12px}
+  .lay{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.lay{grid-template-columns:1fr}}
+  canvas{display:block;width:100%;background:#0d0818;border:1px solid #241636;border-radius:8px}
+  p{font-size:14px;line-height:1.6;color:var(--ink)} .muted{color:var(--dim)}
+  .why{font-family:var(--mono);font-size:11px;color:var(--gold);margin-top:6px;line-height:1.7}
+  .theories{font-family:var(--mono);font-size:11px;color:var(--dim);line-height:1.9;margin-top:10px}
+  .theories b{color:var(--violet2)}
+  .link{font-family:var(--mono);font-size:11px;color:var(--cyan);text-decoration:none;border-bottom:1px dotted var(--faint)}
+  .interact{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+  button{font-family:var(--mono);font-size:11px;font-weight:700;color:#1a0a02;background:var(--violet);border:none;border-radius:7px;padding:7px 13px;cursor:pointer;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><b>VOYNICH</b> — anatomy of the most-analyzed pages</h1>
+  <div class="sub">where a century of attention actually pools, and why · Beinecke MS 408</div>
+  <div class="disc">
+    <b>These are schematic analyses, not the manuscript.</b> Every diagram below is my structural sketch of a
+    page's layout and the debates around it — drawn to explain <i>where</i> the analysis concentrates and
+    <i>why</i>. They are NOT the real images. See the genuine high-res scans at
+    <a class="link" href="https://collections.library.yale.edu/catalog/2002046" target="_blank">Yale Beinecke</a> ·
+    <a class="link" href="https://www.jasondavies.com/voynich/" target="_blank">Voynich Voyager</a> ·
+    <a class="link" href="https://archive.org/details/voynich" target="_blank">Internet Archive</a>.
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+  <div class="panel" id="panel"></div>
+</div>
+
+<script>
+"use strict";
+const PAGES=[
+  {key:"rosette", folio:"f68r3 · cosmological foldout", title:"The Nine-Rosette Foldout",
+   why:"The single most-analyzed page. It looks like a MAP — and a map is the one image that promises to be checkable against the real world. So every 'I solved it, it's a map of ___' claim lands here.",
+   theories:"<b>Map of real places</b> (a city with battlements in one rosette) · <b>cosmological diagram</b> (heavens/elements) · <b>symbolic/alchemical</b> · <b>itinerary</b> between sites. None verified.",
+   draw:"rosette"},
+  {key:"daiin", folio:"throughout · the workhorse word", title:"\u201cdaiin\u201d & the Repetition Problem",
+   why:"If there's a 'popular portion' of the SCRIPT, it's this token. 'daiin' is among the most frequent words, repeats (even triples), and every decipherment dies if it can't explain it.",
+   theories:"<b>A common function word</b> (like 'the'/'and') · <b>a cipher artifact</b> (stochastic encoding, not a real word) · <b>a number/filler</b>. The triple-repeat is the killer clue.",
+   draw:"daiin"},
+  {key:"zodiac", folio:"astronomical quire · zodiac rings", title:"Zodiac Star-Labels",
+   why:"The repeating little star-labels look like NAMES or NUMBERS — a tempting structured list (months? days? stars?). If the labels map to a known set, you get a crib.",
+   theories:"<b>Calendar/month names</b> · <b>star or degree labels</b> · <b>astrological hours</b>. The ~30 stars per ring invite a 30-day-month reading.",
+   draw:"zodiac"},
+  {key:"bath", folio:"f75\u2013f84 · balneological", title:"The Bathing Nymphs",
+   why:"The strange, striking section — naked figures in green pools joined by tubes. Drives the 'what is this book FOR' debate, including the 2024 women's-health-manual theory.",
+   theories:"<b>Women's health / gynecology manual</b> (2024) · <b>balneotherapy</b> (medicinal bathing was real) · <b>alchemical vessels</b> · <b>anatomical allegory</b>.",
+   draw:"bath"},
+  {key:"f116v", folio:"f116v · last page", title:"The Last-Page Marginalia",
+   why:"The one place the book seems to speak in a FAMILIAR alphabet — a few near-Latin lines ('michiton oladabas...'). Teases a translation or a key that never quite resolves.",
+   theories:"<b>A charm or prayer</b> · <b>a recipe</b> · <b>a decoding key/note</b> · <b>later owner's scribble</b>. Readable letters, unreadable meaning.",
+   draw:"f116v"}
+];
+let cur="rosette";
+
+function renderTabs(){
+  const t=document.getElementById('tabs'); t.innerHTML='';
+  PAGES.forEach(p=>{
+    const d=document.createElement('div'); d.className='tab'+(p.key===cur?' sel':'');
+    d.textContent=p.title; d.onclick=()=>{cur=p.key;render();}; t.appendChild(d);
+  });
+}
+function render(){
+  renderTabs();
+  const p=PAGES.find(x=>x.key===cur);
+  const pn=document.getElementById('panel');
+  pn.innerHTML='<h2>'+p.title+'</h2><div class="folio">'+p.folio+'</div>'+
+    '<div class="lay"><div><canvas id="cv" width="440" height="360"></canvas>'+
+    '<div class="interact" id="ix"></div></div>'+
+    '<div><div class="why">WHY IT GETS ANALYZED: '+p.why+'</div>'+
+    '<div class="theories">THEORIES: '+p.theories+'</div>'+
+    '<p class="muted" style="margin-top:14px;font-size:12px">Schematic only — see the real scan at '+
+    '<a class="link" href="https://collections.library.yale.edu/catalog/2002046" target="_blank">Yale Beinecke</a>.</p>'+
+    '</div></div>';
+  const cv=document.getElementById('cv'), c=cv.getContext('2d');
+  DRAW[p.draw](c);
+}
+
+// ---------- drawing routines (all schematic) ----------
+const V='#a78bfa', V2='#c4b5fd', DIM='#9d8bc4', FAINT='#5f5080', GOLD='#d99a2b', CY='#5eead4', PINK='#f472b6', GRN='#34d399';
+function lbl(c,x,y,t,col,sz){ c.fillStyle=col||DIM; c.font=(sz||10)+'px ui-monospace,monospace'; c.textAlign='center'; c.fillText(t,x,y); }
+
+const DRAW={
+  rosette(c){
+    c.clearRect(0,0,440,360);
+    const cx=[110,220,330], cy=[90,180,270], r=34;
+    // connecting tubes
+    c.strokeStyle='rgba(167,139,250,0.3)'; c.lineWidth=6;
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+      if(i<2){c.beginPath();c.moveTo(cx[i+1]-r,cy[j]);c.lineTo(cx[i]+r,cy[j]);c.stroke();}
+      if(j<2){c.beginPath();c.moveTo(cx[i],cy[j+1]-r);c.lineTo(cx[i],cy[j]+r);c.stroke();}
+    }
+    // rosettes
+    let n=1;
+    for(let j=0;j<3;j++)for(let i=0;i<3;i++){
+      const x=cx[i],y=cy[j];
+      c.fillStyle='rgba(167,139,250,0.10)'; c.strokeStyle=V; c.lineWidth=1.5;
+      c.beginPath(); c.arc(x,y,r,0,6.28); c.fill(); c.stroke();
+      // inner petals
+      c.strokeStyle='rgba(196,181,253,0.4)';
+      for(let a=0;a<8;a++){c.beginPath();c.moveTo(x,y);c.lineTo(x+Math.cos(a/8*6.28)*r*0.8,y+Math.sin(a/8*6.28)*r*0.8);c.stroke();}
+      // the "city with battlements" rosette (corner)
+      if(n===1){ c.fillStyle=GOLD; for(let k=0;k<6;k++){c.fillRect(x-18+k*6,y-r-4,3,5);} lbl(c,x,y+r+13,'"city"?',GOLD,9);}
+      lbl(c,x,y+3,'◉',V2,14); n++;
+    }
+    lbl(c,220,348,'9 rosettes + connecting tubes — read by some as a MAP',FAINT,10);
+  },
+  daiin(c){
+    c.clearRect(0,0,440,360);
+    lbl(c,220,24,'token frequency (illustrative EVA)',DIM,11);
+    const data=[["daiin",7,GOLD],["ol",3,V],["chedy",2,V2],["aiin",2,V2],["qokeedy",1,DIM],["shedy",1,DIM]];
+    const max=7, x0=120, w=260;
+    data.forEach((d,i)=>{ const y=50+i*30;
+      c.fillStyle=d[2]; c.fillRect(x0,y,d[1]/max*w,18);
+      c.fillStyle=DIM; c.font='11px ui-monospace,monospace'; c.textAlign='right'; c.fillText(d[0],x0-8,y+14);
+      c.fillStyle='#fff'; c.textAlign='left'; c.fillText(d[1],x0+d[1]/max*w+6,y+14);
+    });
+    // the triple-repeat — the killer clue
+    c.fillStyle='rgba(244,114,182,0.08)'; c.fillRect(40,240,360,90);
+    c.strokeStyle='rgba(244,114,182,0.4)'; c.strokeRect(40,240,360,90);
+    lbl(c,220,262,'THE KILLER CLUE — adjacent repetition',PINK,11);
+    c.font='15px ui-monospace,monospace'; c.fillStyle=V2; c.textAlign='center';
+    c.fillText('qokedy  qokedy  qokedy',220,292);
+    lbl(c,220,314,'natural languages essentially never triple a word in prose',FAINT,9.5);
+  },
+  zodiac(c){
+    c.clearRect(0,0,440,360);
+    const x=220,y=170,R=120;
+    c.strokeStyle=V; c.lineWidth=1.5; c.beginPath(); c.arc(x,y,R,0,6.28); c.stroke();
+    c.beginPath(); c.arc(x,y,R*0.62,0,6.28); c.stroke();
+    // center figure
+    c.fillStyle='rgba(167,139,250,0.15)'; c.beginPath(); c.arc(x,y,30,0,6.28); c.fill();
+    lbl(c,x,y+4,'zodiac\nsign',V2,11);
+    // ~30 star-labels around the ring
+    for(let i=0;i<30;i++){ const a=i/30*6.28-1.57;
+      const sx=x+Math.cos(a)*R*0.82, sy=y+Math.sin(a)*R*0.82;
+      c.fillStyle=GOLD; c.beginPath();
+      for(let k=0;k<5;k++){const aa=k/5*6.28-1.57; c.lineTo(sx+Math.cos(aa)*3,sy+Math.sin(aa)*3);} c.fill();
+      const lx=x+Math.cos(a)*R*1.02, ly=y+Math.sin(a)*R*1.02;
+      c.fillStyle='rgba(157,139,196,0.5)'; c.fillRect(lx-5,ly-1,10,2); // label stub
+    }
+    lbl(c,x,330,'~30 star-labels per ring → tempting "30-day month" reading',FAINT,10);
+  },
+  bath(c){
+    c.clearRect(0,0,440,360);
+    // green pools connected by tubes
+    c.fillStyle='rgba(52,211,153,0.12)'; c.strokeStyle='rgba(52,211,153,0.5)'; c.lineWidth=1.5;
+    const pools=[[110,90,46],[300,110,40],[200,230,54],[330,260,38]];
+    // tubes
+    c.strokeStyle='rgba(52,211,153,0.35)'; c.lineWidth=7;
+    c.beginPath();c.moveTo(150,110);c.lineTo(270,120);c.stroke();
+    c.beginPath();c.moveTo(120,130);c.lineTo(190,200);c.stroke();
+    c.beginPath();c.moveTo(245,245);c.lineTo(300,255);c.stroke();
+    pools.forEach(p=>{ c.fillStyle='rgba(52,211,153,0.12)'; c.strokeStyle='rgba(52,211,153,0.5)'; c.lineWidth=1.5;
+      c.beginPath(); c.ellipse(p[0],p[1],p[2],p[2]*0.6,0,0,6.28); c.fill(); c.stroke();
+      // nymph stick-figures
+      for(let k=0;k<3;k++){ const fx=p[0]-p[2]*0.5+k*p[2]*0.5, fy=p[1];
+        c.strokeStyle=V2; c.lineWidth=1.5;
+        c.beginPath();c.arc(fx,fy-10,3,0,6.28);c.stroke();
+        c.beginPath();c.moveTo(fx,fy-7);c.lineTo(fx,fy+4);c.stroke();
+      }
+    });
+    lbl(c,220,340,'figures in connected pools → "women\'s health manual" (2024 theory)',FAINT,10);
+  },
+  f116v(c){
+    c.clearRect(0,0,440,360);
+    lbl(c,220,30,'the one near-LATIN page',CY,11);
+    // simulated marginalia lines (NOT a transcription claim — shapes only)
+    c.strokeStyle='rgba(157,139,196,0.5)'; c.lineWidth=1;
+    const lines=['michiton oladabas multos','te tccc cs portas','+ anchiton ...'];
+    c.font='15px ui-monospace,monospace'; c.textAlign='left';
+    lines.forEach((t,i)=>{ c.fillStyle=i<2?V2:FAINT; c.fillText(t,70,90+i*40); });
+    // annotation
+    c.fillStyle='rgba(217,154,43,0.07)'; c.fillRect(40,210,360,120);
+    c.strokeStyle='rgba(217,154,43,0.4)'; c.strokeRect(40,210,360,120);
+    lbl(c,220,234,'READABLE LETTERS — UNREADABLE MEANING',GOLD,11);
+    lbl(c,220,258,'looks like Latin, parses as nothing',DIM,10);
+    lbl(c,220,280,'charm? recipe? decoding key? owner\'s note?',V2,10);
+    lbl(c,220,308,'(shapes shown are schematic, not a transcription)',FAINT,9);
+  }
+};
+render();
+</script>
+</body>
+</html>
